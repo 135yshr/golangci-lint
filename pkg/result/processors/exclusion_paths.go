@@ -73,7 +73,7 @@ func (p *ExclusionPaths) Process(issues []*result.Issue) ([]*result.Issue, error
 		return issues, nil
 	}
 
-	return filterIssues(issues, p.shouldPassIssue), nil
+	return filterIssuesUnsafe(issues, p.shouldPassIssue), nil
 }
 
 func (p *ExclusionPaths) Finish() {
@@ -93,6 +93,14 @@ func (p *ExclusionPaths) Finish() {
 }
 
 func (p *ExclusionPaths) shouldPassIssue(issue *result.Issue) bool {
+	if issue.RelativePath == "" {
+		if issue.WorkingDirectoryRelativePath != "" {
+			issue.RelativePath = issue.WorkingDirectoryRelativePath
+		} else if issue.FilePath() != "" {
+			issue.RelativePath = issue.FilePath()
+		}
+	}
+
 	for _, pattern := range p.pathPatterns {
 		if pattern.MatchString(issue.RelativePath) {
 			p.excludedPathCounter[pattern]++
