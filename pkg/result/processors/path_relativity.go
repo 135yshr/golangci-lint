@@ -44,7 +44,6 @@ func (p *PathRelativity) Process(issues []*result.Issue) ([]*result.Issue, error
 		newIssue.RelativePath, err = filepath.Rel(p.basePath, issue.FilePath())
 		if err != nil || newIssue.RelativePath == "" {
 			p.log.Warnf("Getting relative path (basepath): %v", err)
-			// Fallback to absolute filepath so downstream processors can still match.
 			newIssue.RelativePath = issue.FilePath()
 		}
 
